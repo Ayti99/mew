@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head> 
+  <meta charset="UTF-8" />
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    /* Screen, Home Page */
+    body{
+      background: url("assets/images/background_spiral.jpg") no-repeat center center fixed;
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+      font-family: "Varnyx-Regular", sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+
+    }
+
+    .body {
+      position: relative;
+    }
+
+    body::after{
+      content:"";
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 120px #000;
+      z-index: -1;
+    }
+
+    @font-face{
+      font-family: "Varnyx-Regular";
+      src: url("assets/font/Varnyx-Regular.ttf") format("truetype");
+    }
+
+
+    @keyframes fadeUp {
+      from{
+        opacity:0;
+        transform: translateY(40px);
+      }
+      to{
+        opacity:1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Title */
+    .title{
+        padding-top: 60px;
+        text-align:center;
+        font-size: 64px;
+        letter-spacing: 4px;
+        color: #fff;
+        text-shadow:0 0 5px #000;
+        margin-top: 30px;
+        animation: fadeUp 1.2s ease-out;
+    }
+
+    /* Character Text */
+    .character h2{
+      font-size:40px;
+      margin-top:10px;
+      color: #fff;
+      text-shadow:0 0 5px #000;
+      transition:.4s;
+    }
+
+    /* Selection */
+    .select-screen{
+      display:flex;
+      gap:50px;
+      justify-content:center;
+      padding:50px;
+      flex-wrap:wrap;
+    }
+
+    /* Characters */
+    .character{
+      width:360px;
+      height:410px;
+      background: #000;
+      border-radius:20px;
+      padding:15px;
+      transition: .4s;
+      animation: fadeUp 1.2s ease-out;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Angela Home */
+    .character.angela{
+      border:2px solid #FF69B4;
+      box-shadow: 0 0 5px #FF69B4,
+      inset 0 0 25px rgba(0,0,0,0.8);
+    }
+
+    /* Nivangelo Home */
+    .character.nivangelo{
+      border:2px solid #FF0000;
+      box-shadow: 0 0 5px #FF0000,
+      inset 0 0 25px rgba(0,0,0,0.8);
+    }
+
+    /* Liron Home */
+    .character.liron{
+      border:2px solid #FF5E7E;
+      box-shadow: 0 0 5px #FF5E7E,
+      inset 0 0 25px rgba(0,0,0,0.8);
+    }
+
+    /* Pages (Info Characters) */
+  .page{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter: blur(6px);
+    padding:60px;
+    animation: fadeIn .5s ease;
+    color:white;
+    z-index: 999;
+    overflow-y:auto;
+  }
+  .page p {
+    font-size: 40px;
+    text-align: center;
+    line-height: 1.6;
+    color: #fff;
+    text-shadow: 0 0 8px #000;
+  }
+    @keyframes fadeIn{
+      from{opacity:0; transform:scale(.95);}
+      to{opacity:1; transform:scale(1);}
+  }
+  /* Page Cover */
+  .hero-img{
+    width: 90%;
+    max-width: 850px;
+    display: block;
+    margin: 0 auto 40px auto;
+    border-radius:15px;
+  }
+  /* Grid Top */
+  .grid-4{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:25px;
+    max-width:1100px;
+    margin:25px auto;
+  }
+  .grid-4 img{
+    width:100%;
+    border-radius:15px;
+    object-fit:cover;
+  }
+  /* Grid Bottom */
+  .grid-3{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:25px;
+    max-width:1200px;
+    margin:25px auto;
+  }
+  .grid-3 img{
+    width:100%;
+    border-radius:15px;
+    object-fit:cover;
+  }
+
+  /* Song */
+  .song {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    align-items: center;
+    justify-items: center;
+    max-width: 1200px;
+    margin: 30px auto;
+  }
+  .song img {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 15px;
+    object-fit: cover;
+  }
+  .song-audio{
+    width: 230px;
+    cursor: pointer;
+    transition: transform .4s ease, filter .4s ease, opacity .4s ease;
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  /* Song Quotes */
+  .quote{
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .quote p{
+    font-size:24px;
+    color:white;
+    text-shadow:0 0 8px black;
+    margin:0;
+  }
+
+  /* Song Angela */
+  #char1 .song-audio.playing{
+    filter: drop-shadow(0 0 10px #FF69B4);
+    transform: scale(1.08);
+    transition: .3s ease;
+  }
+  /* Song Nivangelo */
+  #char2 .song-audio.playing{
+    filter: drop-shadow(0 0 10px #FF0000);
+    transform: scale(1.08);
+    transition: .3s ease;
+  }
+  /* Song Liron */
+  #char3 .song-audio.playing{
+    filter: drop-shadow(0 0 10px #FF5E7E);
+    transform: scale(1.08);
+    transition: .3s ease;
+  }
+
+  /* Page Buttons */
+  .page .close{
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    font-size: 36px;
+    background: none;
+    cursor: pointer;
+    border: none;
+    text-shadow: 0 0 10px #000;
+    transition: 0.3s;
+  }
+  .page .back{
+    display: block;
+    margin: 60px auto 40px auto;
+    font-size: 32px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-shadow: 0 0 8px #000;
+    transition: 0.3s;
+  }
+
+  /* Angela */
+  #char1 h1{
+    font-size: 60px;
+    text-align: center;
+    color: #FF69B4;
+    text-shadow: 0 0 8px #000;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+  #char1 img{
+    border:2px solid #FF69B4;
+    box-shadow: 0 0 5px #FF69B4,
+    inset 0 0 25px rgba(0,0,0,0.8);
+  }
+  #char1 .close{
+    color: #FF69B4;
+  }
+  #char1 .back{
+    color: #FF69B4;
+  }
+
+  /* Nivangelo */
+  #char2 h1{
+    font-size: 60px;
+    text-align: center;
+    color: #FF0000;
+    text-shadow: 0 0 8px #000;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+  #char2 img{
+    border:2px solid #FF0000;
+    box-shadow: 0 0 5px #FF0000,
+    inset 0 0 25px rgba(0,0,0,0.8);
+  }
+  #char2 .close{
+    color: #FF0000;
+  }
+  #char2 .back{
+    color: #FF0000;
+  }
+    
+  /* Liron */
+  #char3 h1{
+    font-size: 60px;
+    text-align: center;
+    color: #FF5E7E;
+    text-shadow: 0 0 8px #000;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+  #char3 img{
+    border:2px solid #FF5E7E;
+    box-shadow: 0 0 5px #FF5E7E,
+    inset 0 0 25px rgba(0,0,0,0.8);
+  }
+  #char3 .close{
+    color: #FF5E7E;
+  }
+  #char3 .back{
+    color: #FF5E7E;
+  }
+
+  /* Model Viewer */
+  model-viewer{
+    width:100%;
+    height:100%;
+    background:transparent;
+    transition:.4s;
+    transform: scale(1.15);
+  }
+  /* Angela ModelViewer */
+  .character.angela model-viewer{
+    filter: drop-shadow(0 0 5px #FF69B4);
+  }
+  /* Nivangelo ModelViwer */
+  .character.nivangelo model-viewer{
+    filter: drop-shadow(0 0 5px #FF0000);
+  }
+  /* Liron ModelViewer */
+  .character.liron model-viewer{
+    filter: drop-shadow(0 0 5px #FF5E7E);
+  }
+
+  /* Hover Buttons */
+  .page .back:hover{
+    transform: scale(1.1);
+  }
+  .page .close:hover{
+    transform: scale(1.2);
+    text-shadow: 0 0 18px #fff;
+  }
+
+  /* Hover Character */
+  .character.angela:hover{
+    transform: scale(1.08);
+    box-shadow: 0 0 10px #FF69B4;
+    border-color:#FF69B4;
+  }
+  .character.nivangelo:hover{
+    transform: scale(1.08);
+    box-shadow: 0 0 10px #FF0000;
+    border-color: #FF0000;
+  }
+  .character.liron:hover{
+    transform: scale(1.08);
+    box-shadow: 0 0 10px #FF5E7E;
+    border-color: #FF5E7E;
+  }
+
+  /* Hover Model Viewer */
+  .character.angela:hover model-viewer{
+    background: linear-gradient(90deg, #FF69B4, #FF69B4);
+    filter: drop-shadow(0 0 5px #FF69B4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF69B4;
+  }
+  .character.nivangelo:hover model-viewer{
+    background: linear-gradient(90deg, #FF0000, #FF0000);
+    filter: drop-shadow(0 0 5px #FF0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF0000;
+  }
+  .character.liron:hover model-viewer{
+    background: linear-gradient(90deg, #FF5E7E, #FF5E7E);
+    filter: drop-shadow(0 0 5px #FF5E7E);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF5E7E;
+  }
+
+  /* Hover H2 */
+  .character.angela:hover h2{
+    background: linear-gradient(90deg, #FF69B4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF69B4;
+  }
+  .character.nivangelo:hover h2{
+    background: linear-gradient(90deg, #FF0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF0000;
+  }
+  .character.liron:hover h2{
+    background: linear-gradient(90deg, #FF5E7E);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #FF5E7E;
+  }
+
+  </style>
+</head>
+
+<body>
+
+<section id="home"></section>
+
+<section id="home">
+  <h2 class="title">MASCARADA</h2>
+
+  <div class="select-screen">
+
+    <div class="character angela" data-target="char1">
+      <model-viewer src="assets/angela/angela3d/angela_opt.glb" auto-rotate camera-controls></model-viewer>
+      <h2>Angela</h2>
+    </div>
+
+    <div class="character nivangelo" data-target="char2">
+      <model-viewer src="assets/nivangelo/nivangelo3d/nivangelo_opt.glb" auto-rotate camera-controls></model-viewer>
+      <h2>Nivangelo</h2>
+    </div>
+
+    <div class="character liron" data-target="char3">
+      <model-viewer src="assets/liron/liron3d/liron_opt.glb" auto-rotate camera-controls></model-viewer>
+      <h2>Liron</h2>
+    </div>
+
+  </div>
+</section>
+
+<section class="page" id="char1">
+  <button class="close">ㄨ</button>
+  <h1>Angela</h1>
+  <img class ="hero-img" src ="assets/angela/angela_ortho_front.jpeg">
+  <p>The Fallen Soul</p>
+  <p>Unaware of her non-identical core believes to have been born cold hearted and numb seeking a mask to finally belong.</p>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ 3D Model made in Nomad Sculpt ୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="grid-4">
+  <img src ="assets/angela/angela_left.jpeg">
+  <img src ="assets/angela/angela_front.jpeg">
+  <img src ="assets/angela/angela_right.jpeg">
+  <img src ="assets/angela/angela_back.jpeg">
+</div>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ Inspiration ୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="song">
+
+  <div class ="quote">
+  <img class="song-audio" data-sound="assets/audio/rabbit_hole_suburban.mp3" src="assets/images/rabbit_hole_suburban.png">
+  <p>♪</p>
+  <p>"Don't try to break my fall"</p>
+  <P>"Down this rabbit hole I (go)"</p>
+  <p>"Who are you? I hardly know"</p>
+  <p>"I should think that I would Wake Up"</p>
+  <p>"What a disaster to be late for my own ball"</p>
+  <p>"Wake up"</p>
+  <p>"Heart beating faster"</p>
+  <p>"Hope the queen is rational"</p>
+  <p>♪</p>
+  </div>
+
+  <div class ="quote">
+  <img class="song-audio" data-sound="assets/audio/freak.mp3" src="assets/images/freak.png">
+  <p>♪</p>
+  <p>"You're wasting"</p>
+  <p>"Your wasting all"</p> 
+  <p>"Of your time finding a cure"</p>
+  <p>"When there's no disease"</p>
+  <p>"You're wasting"</p>
+  <p>"Your wasting all"</p>
+  <p>"Of your talent on an audience"</p>
+  <p>"That sees a freak"</p>
+  <p>♪</p>
+  </div>
+</div>
+
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="grid-3">
+  <img src ="assets/angela/angela_ortho_left.jpeg">
+  <img src ="assets/angela/angela_front.jpeg">
+  <img src ="assets/angela/angela_ortho_right.jpeg">
+</div>
+  <p>© Mascarada</p>
+  <button class="back">↩</button>
+</section>
+
+<section class="page" id="char2">
+  <button class="close">ㄨ</button>
+  <h1>Nivangelo</h1>
+  <img class ="hero-img" src ="assets/nivangelo/nivangelo_ortho_front.jpeg">
+  <p>Overlord Of The Aching Cores</p>
+  <p>Beware when dancing at the masquerade ball otherwise you'll fall into it's hole where numbness reigns all.</p>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ 3D Model made in Nomad Sculpt ୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="grid-4">
+  <img src ="assets/nivangelo/nivangelo_left.jpeg">
+  <img src ="assets/nivangelo/nivangelo_front.jpeg">
+  <img src ="assets/nivangelo/nivangelo_right.jpeg">
+  <img src ="assets/nivangelo/nivangelo_back.jpeg">
+</div>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ Inspiration ୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="song">
+
+  <div class ="quote">
+  <img class="song-audio" data-sound="assets/audio/the_magick.mp3" src="assets/images/the_magick.png">
+  <p>♪</p>
+  <p>"Kill 'em all let’s pray"</p>
+  <p>"Send 'em straight into the underworld"</p>
+  <p>"Times are tough and they wanna lie"</p>
+  <p>"I got the magick"</p>
+  <p>♪</p>
+  </div>
+
+  <div class ="quote">
+  <img class="song-audio" data-sound="assets/audio/smells_blood.mp3" src="assets/images/smells_blood.png">
+  <p>♪</p>
+  <p>"God can't stop me, we are coming"</p>
+  <p>"You are one of us, remember"</p>
+  <p>"I don't need God because I'm Him"</p>
+  <p>♪</p>
+  </div>
+  
+</div>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <div class ="grid-3">
+  <img src ="assets/nivangelo/nivangelo_ortho_left.jpeg">
+  <img src ="assets/nivangelo/nivangelo_front.jpeg">
+  <img src ="assets/nivangelo/nivangelo_ortho_right.jpeg">
+</div>
+  <p>© Mascarada</p>
+  <button class="back">↩</button>
+</section>
+
+<section class="page" id="char3">
+  <button class="close">ㄨ</button>
+  <h1>Liron</h1>
+  <img class ="hero-img" src ="assets/liron/liron_ortho_front.jpeg">
+  <p>Queen Knowledge Keeper</p>
+  <p>Never shares it's secrets but better listen to its nightmarish whispers.</p>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ 3D Model made in Nomad Sculpt ୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="grid-4">
+  <img src ="assets/liron/liron_left.jpeg">
+  <img src ="assets/liron/liron_front.jpeg">
+  <img src ="assets/liron/liron_right.jpeg">
+  <img src ="assets/liron/liron_back.jpeg">
+</div>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+  <p>⊹₊ ˚‧︵‿₊୨ Inspiration ୧₊‿︵‧ ˚ ₊⊹</p>
+  <div class ="song">
+
+    <div class ="quote">
+    <img class="song-audio" data-sound="assets/audio/demon_mode.mp3" src="assets/images/demon_mode.png">
+    <p>♪</p>
+    <p>"You're running out of time"</p>
+    <p>"And soon you'll be all mine"</p>
+    <p>"I'll never let you go"</p>
+    <p>"I hit my Demon mode"</p>
+    <p>"Bow down and pray that I don't take your soul"</p>
+    <p>♪</p>
+    <p></p>
+    </div>
+
+    <div class ="quote">
+    <img class="song-audio" data-sound="assets/audio/rabbit_hole_aviva.mp3" src="assets/images/rabbit_hole_aviva.png">
+    <p>♪</p>
+    <P>"I'll drag you into my home"</P>
+    <p>"Lose you deep in my thoughts"</p>
+    <p>"Fall inside the rabbit hole again"</p>
+    <P>"I'll drag you into my home"</P>
+    <p>"Lose you deep in my thoughts"</p>
+    <p>"Fall inside the rabbit hole again"</p>
+    <p>♪</p>
+    </div>
+
+  </div>
+  <p>⊹₊ ˚‧︵‿₊୨୧₊‿︵‧ ˚ ₊⊹</p>
+<div class ="grid-3">
+  <img src ="assets/liron/liron_ortho_left.jpeg">
+  <img src ="assets/liron/liron_front.jpeg">
+  <img src ="assets/liron/liron_ortho_right.jpeg">
+</div>
+  <p>© Mascarada</p>
+  <button class="back">↩</button>
+</section>
+
+
+<script>
+const home = document.getElementById("home");
+const pages = document.querySelectorAll(".page");
+const characters = document.querySelectorAll(".character");
+const backBtns = document.querySelectorAll(".back");
+const closeBtns = document.querySelectorAll(".close");
+
+characters.forEach(char => {
+  char.addEventListener("dblclick", () => {
+    const id = char.dataset.target;
+
+    home.style.display = "none";
+    document.getElementById(id).style.display = "block";
+  });
+});
+
+backBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    pages.forEach(p => p.style.display = "none");
+    home.style.display = "block";
+  });
+});
+
+closeBtns.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    pages.forEach(p=>p.style.display = "none");
+    home.style.display = "block";
+  });
+});
+
+/* Song Audio */
+let currentSound = null;
+let currentImg = null;
+
+document.querySelectorAll(".song-audio").forEach(img => {
+  img.addEventListener("click", () => {
+
+    if (currentImg === img) {
+      if (currentSound.paused) {
+        currentSound.play();
+        img.classList.add("playing");
+      } else {
+        currentSound.pause();
+        img.classList.remove("playing");
+      }
+      return;
+    }
+
+    if (currentSound) {
+      currentSound.pause();
+      currentImg.classList.remove("playing");
+    }
+
+    currentImg = img;
+    currentSound = new Audio(img.dataset.sound);
+    currentSound.play();
+
+    img.classList.add("playing");
+  });
+});
+
+</script>
+
+</body>
+
+
+
+</html>
